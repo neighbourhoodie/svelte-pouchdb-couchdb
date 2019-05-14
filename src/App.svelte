@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte'
+  import { sortBy } from 'lodash'
   import PouchDB from 'pouchdb-browser'
 
   import TodoItem from './todo-item.svelte'
@@ -9,8 +10,10 @@
 
   // Set up our vars and defaults
   let newTodoText = ''
+  let sortByWhat = 'createdAt'
   // All the todos directly from the PouchDB. Sorting and filtering comes later
   let todos = []
+  $: sortedTodos = sortBy(todos, [sortByWhat])
 
   // Helper for reloading all todos from the local PouchDB. It’s on-device and has basically zero latency,
   // so we can use it quite liberally instead of keeping our local state up to date like you’d do
@@ -76,8 +79,17 @@
   }
 </style>
 
+<div>
+  <label>Sort by:</label>
+  <select bind:value={sortByWhat}>
+    <option value='createdAt'>Time</option>
+    <option value='text'>Todo text</option>
+    <option value='complete'>Completion</option>
+  </select>
+</div>
+
 <ul>
-  {#each todos as todo}
+  {#each sortedTodos as todo}
     <TodoItem todo={todo} on:remove={removeItem} on:update={updateStatus}/>
   {/each}
 </ul>
