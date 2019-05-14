@@ -11,9 +11,14 @@
   // Set up our vars and defaults
   let newTodoText = ''
   let sortByWhat = 'createdAt'
+  let filterByWhat = ''
   // All the todos directly from the PouchDB. Sorting and filtering comes later
   let todos = []
-  $: sortedTodos = sortBy(todos, [sortByWhat])
+  $: sortedAndFilteredTodos = sortBy(todos, [sortByWhat]).filter((todo) => {
+    const [filterKey, filterValue] = filterByWhat.split(':')
+    // Only filter if there’s a proper filter set
+    return filterKey && filterValue ? todo[filterKey].toString() === filterValue : true
+  })
 
   // Helper for reloading all todos from the local PouchDB. It’s on-device and has basically zero latency,
   // so we can use it quite liberally instead of keeping our local state up to date like you’d do
@@ -87,9 +92,17 @@
     <option value='complete'>Completion</option>
   </select>
 </div>
+<div>
+  <label>Filter:</label>
+  <select bind:value={filterByWhat}>
+    <option value=''>Show all todos</option>
+    <option value='complete:true'>Show completed todos</option>
+    <option value='complete:false'>Show open todos</option>
+  </select>
+</div>
 
 <ul>
-  {#each sortedTodos as todo}
+  {#each sortedAndFilteredTodos as todo}
     <TodoItem todo={todo} on:remove={removeItem} on:update={updateStatus}/>
   {/each}
 </ul>
