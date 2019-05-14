@@ -20,6 +20,7 @@
   let newTodoText = ''
   let sortByWhat = 'createdAt'
   let filterByWhat = ''
+  let isLoading = true
   // All the todos directly from the PouchDB. Sorting and filtering comes later
   let todos = []
   $: sortedAndFilteredTodos = sortBy(todos, [sortByWhat]).filter((todo) => {
@@ -37,6 +38,7 @@
       include_docs: true
     })
     todos = allDocs.rows.map(row => row.doc)
+    isLoading = false
   }
 
   // Event handlers for adding, updating and removing todos
@@ -91,6 +93,22 @@
     width: 440px;
   }
 </style>
+
+{#if isLoading}
+  <h1>
+    Loading your todos…
+  </h1>
+{:else}
+  {#if todos.length === 0}
+    <h1>
+      Zero Todos! Nice ✊
+    </h1>
+  {:else}
+    <h1>
+      Showing {sortedAndFilteredTodos.length} of {todos.length} todos
+    </h1>
+  {/if}
+{/if}
 
 <div>
   <label>Sort by:</label>
