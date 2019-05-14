@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte'
+  import { fade } from 'svelte/transition'
   import { debounce } from 'lodash'
 
   const dispatch = createEventDispatcher()
@@ -51,7 +52,7 @@
   }
 </style>
 
-<li>
+<li transition:fade>
   {#if todo.complete}
     <input class='is-complete' value={todo.text} disabled />
     <button on:click={toggleStatus}>❌</button>
