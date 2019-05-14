@@ -110,7 +110,7 @@
 </div>
 
 <ul>
-  {#each sortedAndFilteredTodos as todo}
+  {#each sortedAndFilteredTodos as todo (todo._id)}
     <TodoItem todo={todo} on:remove={removeItem} on:update={updateStatus}/>
   {/each}
 </ul>
