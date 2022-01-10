@@ -5,34 +5,30 @@
 
   import TodoItem from './todo-item.svelte'
 
-  // Set up local PouchDB and continuous replication to remote CouchDB
+  // Configuration de PouchDB localement et reproduction remote continue à CouchDB
   let db = new PouchDB('db')
-  const replication = PouchDB.sync('db', 'http://localhost:5984/svelte-todo-db', {
+  const reproduction = PouchDB.sync('db', 'http://localhost:5984/svelte-todo-db', {
     live: true,
     retry: true
   }).on('change', async function (info) {
     await updateTodos()
   }).on('error', function (err) {
-    console.log('Replication error:', err)
+    console.log('Error de reproduction :', err)
   })
 
-  // Set up our vars and defaults
+  // Configuration des variables et defaults
   let newTodoText = ''
   let sortByWhat = 'createdAt'
   let filterByWhat = ''
   let isLoading = true
-  // All the todos directly from the PouchDB. Sorting and filtering comes later
+  // Tous les todos directement de PouchDB. Sorte et filtrage vont après
   let todos = []
   $: sortedAndFilteredTodos = sortBy(todos, [sortByWhat]).filter((todo) => {
     const [filterKey, filterValue] = filterByWhat.split(':')
-    // Only filter if there’s a proper filter set
+    // Filtrage est fait uniquement quand il y a un groupe propre
     return filterKey && filterValue ? todo[filterKey].toString() === filterValue : true
   })
 
-  // Helper for reloading all todos from the local PouchDB. It’s on-device and has basically zero latency,
-  // so we can use it quite liberally instead of keeping our local state up to date like you’d do
-  // in a Redux reducer. It also saves us from having to rebuild the local state todos from the data we sent
-  // to the database and the `_id` and `_rev` values that were sent back.
   async function updateTodos() {
     const allDocs = await db.allDocs({
       include_docs: true
@@ -41,7 +37,8 @@
     isLoading = false
   }
 
-  // Event handlers for adding, updating and removing todos
+  // Handlers pour ajouter, mettre à jour et supprimer les todos
+  // Fonction pour ajouter des nouveaux todos
   async function add(event) {
     const newTodo = {
       text: newTodoText,
@@ -55,6 +52,7 @@
     newTodoText = ''
   }
 
+  // Fonction pour mettre à jour le status du todo
   async function updateStatus(event) {
     const { todo } = event.detail
     const update = await db.put(todo)
@@ -63,19 +61,19 @@
     }
   }
 
+  // Fonction pour supprimer un item
   async function removeItem(event) {
     const { todo: todoToRemove } = event.detail
     const removal = await db.remove(todoToRemove)
     if (removal.ok) {
-      // For removal, we can just update the local state instead of reloading everything from PouchDB,
-      // since we no longer care about the doc’s revision.
+      // Pour la suppression, on met à jour l'état local.
       todos = todos.filter((todo) => {
         return todo._id !== todoToRemove._id
         })
     }
   }
 
-  // Load todos on first run
+  // Charge todos en premier temps
   onMount(async () => {
     await updateTodos()
   })
@@ -96,34 +94,34 @@
 
 {#if isLoading}
   <h1>
-    Loading your todos…
+    Charge de todos…
   </h1>
 {:else}
   {#if todos.length === 0}
     <h1>
-      Zero Todos! Nice ✊
+      Zero todos! Niquel ☻ 
     </h1>
   {:else}
     <h1>
-      Showing {sortedAndFilteredTodos.length} of {todos.length} todos
+      Affichant {sortedAndFilteredTodos.length} de {todos.length} todos
     </h1>
   {/if}
 {/if}
 
 <div>
-  <label for="ordre">Sort by:</label>
+  <label for="sorte">Sorte par:</label>
   <select bind:value={sortByWhat}>
-    <option value='createdAt'>Time</option>
-    <option value='text'>Todo text</option>
-    <option value='complete'>Completion</option>
+    <option value='createdAt'>Heure</option>
+    <option value='text'>Todo texte</option>
+    <option value='complete'>Complete</option>
   </select>
 </div>
 <div>
-  <label for="filtre">Filter:</label>
+  <label for="filtre">Filtre:</label>
   <select bind:value={filterByWhat}>
-    <option value=''>Show all todos</option>
-    <option value='complete:true'>Show completed todos</option>
-    <option value='complete:false'>Show open todos</option>
+    <option value=''>Montrer tous les todos</option>
+    <option value='complete:true'>Affichage de todos completés</option>
+    <option value='complete:false'>Affichage de todos en attente</option>
   </select>
 </div>
 
@@ -135,5 +133,5 @@
 
 <form on:submit|preventDefault={add}>
   <input type='text' bind:value={newTodoText}>
-  <button type='submit'>➕ Add new task</button>
+  <button type='submit'>➕ Ajout une nouvelle tâche</button>
 </form>
