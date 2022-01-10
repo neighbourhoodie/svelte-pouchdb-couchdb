@@ -12,7 +12,7 @@
   function updateText() {
     dispatch('update', {todo})
   }
-  // We don’t want to clobber the local DB, so we debounce saving on every keystroke
+  // On attend quelques instants pour modifier l'action après frappé grâce à la fonction debounde
   const debouncedUpdateText = debounce(updateText, 500)
 
   function toggleStatus() {
@@ -57,6 +57,7 @@
     <input class='is-complete' value={todo.text} disabled />
     <button on:click={toggleStatus}>❌</button>
   {:else}
+    <!-- On détect les clicks et met à jour l'état du todo -->
     <input type='text' on:keyup={debouncedUpdateText} bind:value={todo.text}>
     <button on:click={toggleStatus}>✔️</button>
   {/if}
