@@ -3,17 +3,18 @@
   import { sortBy } from 'lodash'
   import PouchDB from 'pouchdb-browser'
 
+  // On réutilise les méthodes et composants du fichier todo-item.svelte 
   import TodoItem from './todo-item.svelte'
 
-  // Configuration de PouchDB localement et reproduction remote continue à CouchDB
+  // Configuration de PouchDB localement et réplication remote continue à CouchDB
   let db = new PouchDB('db')
-  const reproduction = PouchDB.sync('db', 'http://localhost:5984/svelte-todo-db', {
+  const replication = PouchDB.sync('db', 'http://localhost:5984/svelte-todo-db', {
     live: true,
     retry: true
   }).on('change', async function (info) {
     await updateTodos()
   }).on('error', function (err) {
-    console.log('Error de reproduction :', err)
+    console.log('Error de réplication :', err)
   })
 
   // Configuration des variables et defaults
