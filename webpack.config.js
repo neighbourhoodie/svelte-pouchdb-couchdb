@@ -32,8 +32,8 @@ module.exports = {
 				test: /\.css$/,
 				use: [
 					/**
-					 * MiniCssExtractPlugin doesn't support HMR.
-					 * For developing, use 'style-loader' instead.
+					 * MiniCssExtractPlugin ne soutient pas HMR.
+					 * Pour ça, on utilise 'style-loader'.
 					 * */
 					prod ? MiniCssExtractPlugin.loader : 'style-loader',
 					'css-loader'

@@ -111,7 +111,7 @@
 {/if}
 
 <div>
-  <label>Sort by:</label>
+  <label for="ordre">Sort by:</label>
   <select bind:value={sortByWhat}>
     <option value='createdAt'>Time</option>
     <option value='text'>Todo text</option>
@@ -119,7 +119,7 @@
   </select>
 </div>
 <div>
-  <label>Filter:</label>
+  <label for="filtre">Filter:</label>
   <select bind:value={filterByWhat}>
     <option value=''>Show all todos</option>
     <option value='complete:true'>Show completed todos</option>
